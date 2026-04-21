@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Examen - Curso de Notas Easywrite Rally</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #1a73e8;
+            --secondary: #34a853;
+            --danger: #d33b27;
+            --light-gray: #f8f9fa;
+            --border-gray: #dadce0;
+            color-scheme: light;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 700px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            padding: 40px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            color: #1a1a1a;
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 14px;
+        }
+
+        /* Formulario inicial */
+        .form-section {
+            display: block;
+        }
+
+        .form-section.hidden {
+            display: none;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 8px;
+            color: #333;
+            font-size: 14px;
+        }
+
+        input[type="text"],
+        input[type="email"] {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid var(--border-gray);
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        input[type="text"]:focus,
+        input[type="email"]:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #1557b0;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(26, 115, 232, 0.3);
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+
+        /* Sección de examen */
+        .exam-section {
+            display: none;
+        }
+
+        .exam-section.active {
+            display: block;
+        }
+
+        .user-info {
+            background: var(--light-gray);
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 25px;
+            font-size: 13px;
+            color: #666;
+        }
+
+        .user-info strong {
+            color: #333;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: var(--border-gray);
+            border-radius: 3px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--secondary);
+            transition: width 0.3s;
+        }
+
+        .question {
+            margin-bottom: 30px;
+        }
+
+        .question-number {
+            font-size: 12px;
+            color: var(--primary);
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .question-text {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 15px;
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .option {
+            position: relative;
+            cursor: pointer;
+        }
+
+        .option input[type="radio"] {
+            position: absolute;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .option label {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            border: 2px solid var(--border-gray);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin: 0;
+        }
+
+        .option input[type="radio"]:checked + label {
+            border-color: var(--primary);
+            background: rgba(26, 115, 232, 0.05);
+        }
+
+        .option-radio {
+            width: 18px;
+            height: 18px;
+            border: 2px solid var(--border-gray);
+            border-radius: 50%;
+            margin-right: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .option input[type="radio"]:checked + label .option-radio {
+            border-color: var(--primary);
+            background: var(--primary);
+        }
+
+        .option input[type="radio"]:checked + label .option-radio::after {
+            content: '';
+            width: 6px;
+            height: 6px;
+            background: white;
+            border-radius: 50%;
+        }
+
+        /* Resultados */
+        .results-section {
+            display: none;
+            text-align: center;
+        }
+
+        .results-section.active {
+            display: block;
+        }
+
+        .score-circle {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 20px auto;
+            font-size: 48px;
+            font-weight: 700;
+            color: white;
+        }
+
+        .score-circle.excellent {
+            background: var(--secondary);
+        }
+
+        .score-circle.good {
+            background: #4285f4;
+        }
+
+        .score-circle.fair {
+            background: #fbbc04;
+        }
+
+        .score-circle.low {
+            background: var(--danger);
+        }
+
+        .results-message {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin: 20px 0;
+        }
+
+        .results-details {
+            background: var(--light-gray);
+            padding: 20px;
+            border-radius: 6px;
+            margin: 20px 0;
+            text-align: left;
+        }
+
+        .results-details p {
+            margin: 10px 0;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .results-details strong {
+            color: #333;
+        }
+
+        .download-btn {
+            background: var(--secondary);
+            color: white;
+            margin-top: 20px;
+        }
+
+        .download-btn:hover {
+            background: #2d8659;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .btn-group button {
+            flex: 1;
+        }
+
+        .btn-secondary {
+            background: var(--border-gray);
+            color: #333;
+        }
+
+        .btn-secondary:hover {
+            background: #e0e0e0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Sección de Formulario -->
+        <div class="form-section" id="formSection">
+            <div class="header">
+                <h1>📝 Examen de Notas Rally</h1>
+                <p>Curso de Notas Easywrite Rally - Sistema Básico (1-10)</p>
+            </div>
+
+            <form onsubmit="startExam(event)">
+                <div class="form-group">
+                    <label for="nombre">Nombre completo *</label>
+                    <input 
+                        type="text" 
+                        id="nombre" 
+                        name="nombre" 
+                        placeholder="Tu nombre" 
+                        required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="correo">Correo electrónico *</label>
+                    <input 
+                        type="email" 
+                        id="correo" 
+                        name="correo" 
+                        placeholder="tu@correo.com" 
+                        required
+                    >
+                </div>
+
+                <button type="submit" class="btn-primary">Comenzar Examen</button>
+            </form>
+        </div>
+
+        <!-- Sección de Examen -->
+        <div class="exam-section" id="examSection">
+            <div class="header">
+                <h1>📝 Examen de Notas Rally</h1>
+                <p>Curso de Notas Easywrite Rally - Sistema Básico (1-10)</p>
+            </div>
+
+            <div class="user-info">
+                <strong id="userNameDisplay"></strong> | <span id="userEmailDisplay"></span>
+            </div>
+
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+
+            <div id="questionsContainer"></div>
+
+            <div class="btn-group">
+                <button type="button" class="btn-secondary" onclick="previousQuestion()">← Anterior</button>
+                <button type="button" class="btn-primary" id="nextBtn" onclick="nextQuestion()">Siguiente →</button>
+            </div>
+        </div>
+
+        <!-- Sección de Resultados -->
+        <div class="results-section" id="resultsSection">
+            <div class="header">
+                <h1>🎉 ¡Examen Completado!</h1>
+                <p>Curso de Notas Easywrite Rally - Sistema Básico (1-10)</p>
+            </div>
+
+            <div id="scoreDisplay"></div>
+
+            <div class="results-details">
+                <p><strong>Nombre:</strong> <span id="resultName"></span></p>
+                <p><strong>Correo:</strong> <span id="resultEmail"></span></p>
+                <p><strong>Puntuación:</strong> <span id="resultScore"></span></p>
+                <p><strong>Respuestas correctas:</strong> <span id="resultCorrect"></span></p>
+            </div>
+
+            <button type="button" class="download-btn" onclick="downloadResults()">📥 Descargar Resultados</button>
+            <button type="button" class="btn-secondary" style="margin-top: 10px;" onclick="resetExam()">Intentar de Nuevo</button>
+        </div>
+    </div>
+
+    <script>
+        // Preguntas del examen - Sistema Básico 1-10
+        const questions = [
+            {
+                question: "¿En qué se basa la numeración de curvas del 1 al 10 en el sistema básico?",
+                options: [
+                    "En la intensidad de giro del volante",
+                    "En la distancia en metros",
+                    "En el tipo de asfalto",
+                    "En la velocidad máxima del auto"
+                ],
+                correct: 0
+            },
+            {
+                question: "¿Cuáles son los tres aspectos clave para describir una curva con precisión?",
+                options: [
+                    "Velocidad, marca del auto, clima",
+                    "Tipo de asfalto, visibilidad, pendiente",
+                    "Número de curvas anteriores, distancia total, clima",
+                    "Intensidad de giro, longitud, variaciones de intensidad"
+                ],
+                correct: 3
+            },
+            {
+                question: "¿Cuál es la diferencia entre una curva de intensidad 3 y una de intensidad 7?",
+                options: [
+                    "La curva 3 es más cerrada que la 7",
+                    "La curva 7 es más cerrada que la 3",
+                    "Tienen el mismo giro pero diferente longitud",
+                    "No hay diferencia, solo cambia la velocidad"
+                ],
+                correct: 0
+            },
+            {
+                question: "¿Cuál es la característica principal de una curva de intensidad 1?",
+                options: [
+                    "Requiere muy poco giro del volante",
+                    "Es la más cerrada de todas, requiere máximo giro",
+                    "Requiere exactamente 90 grados de giro",
+                    "Está prohibida en competencia"
+                ],
+                correct: 1
+            },
+            {
+                question: "¿Qué significado tiene que una curva 'cierre' en el sistema de notas?",
+                options: [
+                    "Que la intensidad se reduce o disminuye",
+                    "Que la carretera se termina",
+                    "Que debe frenar completamente",
+                    "Que hay un obstáculo en la carretera"
+                ],
+                correct: 0
+            },
+            {
+                question: "¿Qué representa la longitud en la descripción de una curva?",
+                options: [
+                    "La velocidad máxima permitida",
+                    "El tipo de giro del volante",
+                    "La duración o extensión de la curva en metros",
+                    "La distancia hasta la próxima curva"
+                ],
+                correct: 2
+            },
+            {
+                question: "¿Cuál es el objetivo del sistema de notas en el curso Easywrite Rally?",
+                options: [
+                    "Vender aplicaciones de navegación",
+                    "Proporcionar herramientas al piloto para ver y leer la carretera de forma efectiva",
+                    "Enseñar mecánica de autos",
+                    "Entrenar pilotos de Fórmula 1"
+                ],
+                correct: 1
+            },
+            {
+                question: "¿Cómo se describe una curva 'corta', 'leve' o 'nula'?",
+                options: [
+                    "Siempre usando el número 0",
+                    "Son curvas comodín donde no es relevante indicar la intensidad de giro",
+                    "Usando números del 1 al 10",
+                    "Solo en competencias internacionales"
+                ],
+                correct: 1
+            },
+            {
+                question: "¿Qué ventaja tiene el sistema de numeración basado en intensidad de giro?",
+                options: [
+                    "Solo funciona en autos de carreras profesionales",
+                    "Requiere años de experiencia para dominarlo",
+                    "Es fácil de aprender y es objetivo para cualquier tipo de vehículo",
+                    "Es más rápido que otros sistemas"
+                ],
+                correct: 2
+            },
+            {
+                question: "¿Qué describe la intensidad 10 en el sistema básico?",
+                options: [
+                    "La curva más cerrada que requiere máximo giro",
+                    "Una curva de longitud intermedia",
+                    "La curva más rápida, apenas dobla",
+                    "Una curva completamente recta"
+                ],
+                correct: 2
+            }
+        ];
+
+        let currentQuestion = 0;
+        let answers = [];
+        let userData = {};
+
+        function startExam(event) {
+            event.preventDefault();
+            userData.nombre = document.getElementById('nombre').value;
+            userData.correo = document.getElementById('correo').value;
+
+            document.getElementById('formSection').classList.add('hidden');
+            document.getElementById('examSection').classList.add('active');
+
+            document.getElementById('userNameDisplay').textContent = userData.nombre;
+            document.getElementById('userEmailDisplay').textContent = userData.correo;
+
+            renderQuestion();
+        }
+
+        function renderQuestion() {
+            const question = questions[currentQuestion];
+            const container = document.getElementById('questionsContainer');
+            
+            container.innerHTML = `
+                <div class="question">
+                    <div class="question-number">Pregunta ${currentQuestion + 1} de ${questions.length}</div>
+                    <div class="question-text">${question.question}</div>
+                    <div class="options">
+                        ${question.options.map((option, index) => `
+                            <div class="option">
+                                <input 
+                                    type="radio" 
+                                    id="option${index}" 
+                                    name="answer" 
+                                    value="${index}"
+                                    ${answers[currentQuestion] === index ? 'checked' : ''}
+                                    onchange="answers[${currentQuestion}] = ${index}"
+                                >
+                                <label for="option${index}">
+                                    <div class="option-radio"></div>
+                                    ${option}
+                                </label>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+
+            updateProgress();
+            updateButtons();
+        }
+
+        function nextQuestion() {
+            if (currentQuestion < questions.length - 1) {
+                currentQuestion++;
+                renderQuestion();
+            } else {
+                showResults();
+            }
+        }
+
+        function previousQuestion() {
+            if (currentQuestion > 0) {
+                currentQuestion--;
+                renderQuestion();
+            }
+        }
+
+        function updateProgress() {
+            const percentage = ((currentQuestion + 1) / questions.length) * 100;
+            document.getElementById('progressFill').style.width = percentage + '%';
+        }
+
+        function updateButtons() {
+            const nextBtn = document.getElementById('nextBtn');
+            if (currentQuestion === questions.length - 1) {
+                nextBtn.textContent = 'Enviar Examen ✓';
+            } else {
+                nextBtn.textContent = 'Siguiente →';
+            }
+        }
+
+        function showResults() {
+            let correctCount = 0;
+            answers.forEach((answer, index) => {
+                if (answer === questions[index].correct) {
+                    correctCount++;
+                }
+            });
+
+            const percentage = Math.round((correctCount / questions.length) * 100);
+
+            document.getElementById('examSection').classList.remove('active');
+            document.getElementById('resultsSection').classList.add('active');
+
+            let scoreClass = 'excellent';
+            let message = '¡Excelente trabajo!';
+
+            if (percentage < 60) {
+                scoreClass = 'low';
+                message = 'Necesitas estudiar más el material';
+            } else if (percentage < 75) {
+                scoreClass = 'fair';
+                message = 'Buen esfuerzo, pero puedes mejorar';
+            } else if (percentage < 90) {
+                scoreClass = 'good';
+                message = '¡Muy bien hecho!';
+            }
+
+            const scoreDisplay = document.getElementById('scoreDisplay');
+            scoreDisplay.innerHTML = `
+                <div class="score-circle ${scoreClass}">${percentage}%</div>
+                <div class="results-message">${message}</div>
+            `;
+
+            document.getElementById('resultName').textContent = userData.nombre;
+            document.getElementById('resultEmail').textContent = userData.correo;
+            document.getElementById('resultScore').textContent = percentage + '%';
+            document.getElementById('resultCorrect').textContent = correctCount + ' de ' + questions.length;
+        }
+
+        function downloadResults() {
+            let correctCount = 0;
+            answers.forEach((answer, index) => {
+                if (answer === questions[index].correct) {
+                    correctCount++;
+                }
+            });
+
+            const percentage = Math.round((correctCount / questions.length) * 100);
+
+            const text = `
+RESULTADOS DEL EXAMEN
+Curso de Notas Easywrite Rally - Sistema Básico (1-10)
+
+Candidato: ${userData.nombre}
+Correo: ${userData.correo}
+Fecha: ${new Date().toLocaleDateString('es-ES')}
+
+Puntuación: ${percentage}%
+Respuestas Correctas: ${correctCount} de ${questions.length}
+
+Detalles:
+${answers.map((answer, index) => {
+    const isCorrect = answer === questions[index].correct ? '✓' : '✗';
+    return `${index + 1}. ${isCorrect} ${questions[index].question}`;
+}).join('\n')}
+            `;
+
+            const blob = new Blob([text], { type: 'text/plain' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `Examen_${userData.nombre.replace(/\s+/g, '_')}_${new Date().getTime()}.txt`;
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+            document.body.removeChild(a);
+        }
+
+        function resetExam() {
+            currentQuestion = 0;
+            answers = [];
+            userData = {};
+            document.getElementById('formSection').classList.remove('hidden');
+            document.getElementById('resultsSection').classList.remove('active');
+            document.getElementById('nombre').value = '';
+            document.getElementById('correo').value = '';
+        }
+    </script>
+</body>
+</html>
